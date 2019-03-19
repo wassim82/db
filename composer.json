@@ -1,5 +1,5 @@
 {
-  "name": "madtec/madmysqli",
+  "name": "madtec/mysqli",
   "description": "PHP mysqli lib",
   "type": "package",
   "license": "MIT",
@@ -9,7 +9,7 @@
   },
   "autoload": {
     "psr-0": {
-      "madtec\\madmysqli\\": "src/"
+      "Fk": "src/"
     }
   }
 }
