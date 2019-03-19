@@ -1,5 +1,5 @@
 <?php
-
+namespace madmysqli;
 class wasql
 {
 	private $wasmysqli;
