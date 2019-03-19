@@ -1,8 +1,7 @@
 {
   "name": "madtec/madmysqli",
-  "description": "PHP",
-  "keywords": ["mysqli"],
-  "type": "library",
+  "description": "PHP mysqli lib",
+  "type": "package",
   "license": "MIT",
   "author": "Wassim",
   "require": {
