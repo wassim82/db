@@ -1,0 +1,16 @@
+{
+  "name": "madtec/madmysqli",
+  "description": "PHP",
+  "keywords": ["mysqli"],
+  "type": "library",
+  "license": "MIT",
+  "author": "Wassim",
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "autoload": {
+    "psr-0": {
+      "Unirest\\": "src/"
+    }
+  }
+}
