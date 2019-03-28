@@ -1,6 +1,6 @@
 <?php
 namespace madmysqli;
-class wasql
+class madmysqli
 {
 	private $wasmysqli;
 	
