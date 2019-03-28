@@ -1,5 +1,5 @@
 <?php
-namespace madtec;
+namespace madtec\db;
 class Mysqli
 {
 	private $wasmysqli;
