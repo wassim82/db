@@ -54,6 +54,11 @@ class Mysqli
 		$var = mysqli_real_escape_string($this->wasmysqli,$var);
 		return $var;
 	}
+	
+	function sql_encode($var)
+	{
+		return $this->esc($var);
+	}
 
 	function sta($sql)
 	{
