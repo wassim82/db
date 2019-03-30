@@ -44,7 +44,7 @@ class Mysqli
 	
 	function sql_encode($var)
 	{
-		return esc($var);
+		return $this->esc($var);
 	}
 
 	function esc($var)
@@ -55,10 +55,7 @@ class Mysqli
 		return $var;
 	}
 	
-	function sql_encode($var)
-	{
-		return $this->esc($var);
-	}
+	
 
 	function sta($sql)
 	{
