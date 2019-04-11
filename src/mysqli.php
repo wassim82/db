@@ -111,7 +111,7 @@ class Mysqli
 
 	function sql_concat($champs,$mot)
 	{
-
+		$sql_c = "";
 		for ($i=0;$i<sizeof($champs);$i++)
 		{
 			if(substr($champs[$i],0,1)=='`')
