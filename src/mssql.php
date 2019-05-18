@@ -8,8 +8,8 @@ class Mssql
     {
 		try
 		{
-			$this->mssql = new PDO("sqlsrv:Server=".$host.";Database=".$bdd."", $user, $pass);
-			$this->mssql->setAttribute(PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8);
+			$this->mssql = new \PDO("sqlsrv:Server=".$host.";Database=".$bdd."", $user, $pass);
+			$this->mssql->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
 		}
 		catch(Exception $e){
 			echo $e->getMessage() ;
@@ -17,14 +17,16 @@ class Mssql
     }
 	
 			
-	function mssql_concat($ch,$mot)
+	function concat($ch,$mot)
 	{
-		$sql_c = " ' ' ";
-		for ($i = 0; $i <= (sizeof($ch)-1); $i++)
+		$sql_c = "(";
+		for ($i = 0; $i < sizeof($ch); $i++)
 		{
-			$sql_c .= " + ' ' + ".$ch[$i]." ";
+		if( $i > 0 ){$sql_c .= " + ";}
+			$sql_c .= " ".$ch[$i];
+			
 		}
-		$sql_c = "  ".$sql_c." ";
+		$sql_c .= " ) ";
 		
 
 		$mot = strtoupper(trim($mot));
@@ -36,7 +38,7 @@ class Mssql
 		}
 		
 
-		$sql = str_replace(" ","%' AND ".$sql_c." LIKE '%",$this->mssql_encode($mot)."%'");
+		$sql = str_replace(" ","%' AND ".$sql_c." LIKE '%",$this->encode($mot)."%'");
 		
 		$sql = $sql_c." LIKE '%".$sql;
 		return $sql;
@@ -46,16 +48,15 @@ class Mssql
 
 	function mssql_to_array($sql)
 	{
-
 		$sta = $this->mssql->prepare($sql);
 		$sta->execute();
 		$res = array();
 		while($row = $sta->fetch()) {
-			$champs = array();
-			while (list($key, $val) = each($row)) {
-				//echo "$key => $val\n";
-				$row[$key] = utf8_encode($val);
-				if(is_int($key)){unset($row[$key]);}
+
+			foreach ($row as $k => $v)
+			{
+				$row[$k] = utf8_encode($v);
+				if(is_int($k)){unset($row[$k]);}
 			}
 			$res[] = $row;
 		}
@@ -63,17 +64,13 @@ class Mssql
 		return $res;
 	}
 
-	function msta($sql)
+	function sta($sql)
 	{
 		return $this->mssql_to_array($sql);
 	}
 
-	function mssta($sql)
-	{
-		return $this->mssql_to_array($sql);
-	}
 
-	function mssql_encode($str)
+	function encode($str)
 	{
 		if(get_magic_quotes_gpc())
 		{
@@ -82,7 +79,7 @@ class Mssql
 		return str_replace("'", "''", $str);
 	}
 
-	function mssql_decode($str)
+	function decode($str)
 	{
 		if(get_magic_quotes_gpc())
 		{
