@@ -45,8 +45,7 @@ class Mssql
 
 	}
 
-
-	function mssql_to_array($sql)
+	function sta($sql)
 	{
 		$sta = $this->mssql->prepare($sql);
 		$sta->execute();
@@ -62,11 +61,6 @@ class Mssql
 		}
 
 		return $res;
-	}
-
-	function sta($sql)
-	{
-		return $this->mssql_to_array($sql);
 	}
 
 
