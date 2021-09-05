@@ -121,6 +121,13 @@ class Mssql
 		$req->execute();
 		
 	}
+	
+	function req($sql)
+	{
+		$req = $this->mssql->prepare($sql);
+		$req->execute();
+		
+	}
 
 }
 
