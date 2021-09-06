@@ -1,5 +1,6 @@
 <?php
 namespace madtec\db;
+
 class Mssql
 {
 	private $mssql;
@@ -8,7 +9,7 @@ class Mssql
     {
 		try
 		{
-			$this->mssql = new \PDO("sqlsrv:Server=".$host.";Database=".$bdd."", $user, $pass);
+			$this->mssql = new \PDO("dblib:host=".$host.";dbname=".$bdd."", $user, $pass,array(\PDO::ATTR_TIMEOUT => 10));
 			$this->mssql->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
 		}
 		catch(Exception $e){
@@ -44,6 +45,21 @@ class Mssql
 		return $sql;
 
 	}
+	
+	function cast($tbl,$ch)
+	{
+		$sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '".$this->esc($tbl)."' AND  COLUMN_NAME = '".$this->esc($ch)."'";
+		$res = $this->res($sql);
+		
+		if($res=='int')
+		{
+			return "CAST(".$this->champ_format($ch)." AS VARCHAR(12))";
+		}
+		elseif($res=='nvarchar')
+		{
+			return "CAST(".$this->champ_format($ch)." AS TEXT)";
+		}
+	}	
 
 	function sta($sql)
 	{
@@ -64,7 +80,8 @@ class Mssql
 	}
 
 
-	function encode($str)
+	
+	function esc($str)
 	{
 		if(get_magic_quotes_gpc())
 		{
@@ -82,13 +99,40 @@ class Mssql
 		return trim($str);
 	}
 
-	function mssql_insert($champs,$table, $mode = "")
+	
+	
+	function champ_format($ch)
 	{
-		$sql = "INSERT INTO ".$table." ";
+		$ch = str_replace(array("[","]"),"",$ch);
+		$ch = "[".trim($ch)."]";
+		return $ch;
+	}
+	
+	function table_format($ch)
+	{
+		$ch = str_replace(array("[dbo]."),"",$ch);
+		$ch = str_replace(array("[","]"),"",$ch);
+		$ch = "[dbo].[".trim($ch)."]";
+		return $ch;
+	}
+	
+	function val_format($ch)
+	{
+		if(substr($ch,0,1)=="'" && substr($ch,-1)=="'")
+		{
+			$ch = substr($ch,1,-1);
+		}
+		$ch = $this->esc($ch);
+		$ch = "'".$ch."'";
+		return $ch;
+	}
+	
+	function sql_insert($champs,$table, $mode = "")
+	{
+		$sql = "INSERT INTO ".$this->table_format($table)." ";
 		$sqlchamps = "";
 		$sqlvaleurs = "";
 
-		reset($champs);
 		for ($i = 0; $i < sizeof($champs); $i++)
 		{
 			$sqla = "";
@@ -96,13 +140,16 @@ class Mssql
 			{
 				$sqla = ", ";
 			}
-			$sqlchamps .= $sqla.$champs[$i][0];
-			$sqlvaleurs .= $sqla.$champs[$i][1];
-			$sqla = "";
+			
+			$champ = $this->champ_format($champs[$i][0]);
+			$val = $this->val_format($champs[$i][1]);
+			
+			$sqlchamps .= $sqla.$champ;
+			$sqlvaleurs .= $sqla.$val;
 		}
 		$sql .= "(".$sqlchamps.") VALUES (".$sqlvaleurs.")";
 		
-		if($mode=="")
+		if($mode == "")
 		{
 			$req = $this->mssql->prepare($sql);
 			$req->execute();
@@ -111,23 +158,87 @@ class Mssql
 		}
 		else
 		{
-		return $sql;
+			return $sql;
 		}
 	}
-
-	function mssql_req($sql)
+	
+	function update($champs,$table,$where = " WHERE 1 = 2 ",$mode = "")
 	{
-		$req = $this->mssql->prepare($sql);
-		$req->execute();
+		return $this->sql_update($champs,$table,$where,$mode);
+	}
+
+	function sql_update($champs,$table,$where = " WHERE 1 = 2 ",$mode = "")
+	{
+
+		$sql = "UPDATE ".$this->table_format($table)." SET ";
+
+		for ($i=0;$i<sizeof($champs);$i++)
+		{
+			if($i>0)
+			{
+				$sql .= ", ";
+			}
+			$sql .= $this->champ_format($champs[$i][0])." = ".$this->val_format($champs[$i][1]);
+		}
 		
+		if(substr($where,0,1) != " ")
+		{
+			$where = " ".$where;
+		}
+		
+		$sql .= $where;
+		
+		if($mode == "")
+		{
+			$req = $this->mssql->prepare($sql);
+			$req->execute();
+		}
+		else
+		{
+			return $sql;
+		}
 	}
 	
 	function req($sql)
 	{
 		$req = $this->mssql->prepare($sql);
 		$req->execute();
+	}
+	
+	function res($sql,$allch = "")
+	{
+		$req = $this->mssql->prepare($sql);
+		$req->execute();
+		$row = $req->fetch();
+		if($allch=="")
+		{
+			return $row[0];
+		}
+		else
+		{
+			return $row;
+		}
 		
 	}
+	
+	
+	///// ANCIENNE function
+	
+	function mssql_insert($champs,$table, $mode = "")
+	{
+		return $this->sql_insert($champs,$table, $mode = "");
+	}
+	
+	function mssql_req($sql)
+	{
+		return $this->req($sql);
+	}
+	
+	function encode($str)
+	{
+		return $this->esc($str);
+	}
+	
 
 }
 
