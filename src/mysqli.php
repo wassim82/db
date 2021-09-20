@@ -4,6 +4,8 @@ class Mysqli
 {
 	private $wasmysqli;
 	
+	private $reqs = array();
+	
 	public function __construct($host,$user,$pass,$bdd)
     {
 		mb_internal_encoding("UTF-8");
@@ -113,6 +115,44 @@ class Mysqli
 		}
 	}
 	
+	function inserts($ch,$val,$tbl)
+	{
+		$sql = "INSERT INTO ".$this->chformat($tbl)." ";
+		
+		$sql .= " (";
+		for($i=0;$i<sizeof($ch);$i++)
+		{
+			$sql .= " ".$this->chformat($ch[$i]);
+			
+			if($i<sizeof($ch)-1)
+			{
+				$sql .= ",";
+			}
+		}
+		$sql .= " ) VALUES ";
+		
+		for($i=0;$i<sizeof($val);$i++)
+		{
+			$sql .= "(";
+			for($i2=0;$i2<sizeof($val[$i]);$i2++)
+			{
+				$sql .= "'".$this->esc($val[$i][$i2])."'";
+				if($i2<sizeof($val[$i])-1)
+				{
+					$sql .= ",";
+				}
+			}
+			$sql .= ")";
+			if($i<sizeof($val)-1)
+			{
+				$sql .= ",";
+			}
+		}
+
+		
+		$this->req($sql);
+	}
+	
 	function sql_multins($champs,$table,$cpt)
 	{
 		if($cpt==1)
@@ -182,6 +222,13 @@ class Mysqli
 			{mysqli_query($this->wasmysqli,$sql);}
 		else
 			{return $sql;}
+	}
+	
+	function chformat($ch)
+	{
+		$ch = str_replace(array("`"),"",$ch);
+		$ch = "`".trim($ch)."`";
+		return $ch;
 	}
 
 }
