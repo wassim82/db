@@ -4,17 +4,17 @@ namespace madtec\db;
 class Mssql
 {
 	private $mssql;
-	
+	public $connr;
 	public function __construct($host,$user,$pass,$bdd)
     {
 		try
 		{
 			$this->mssql = new \PDO("dblib:host=".$host.";dbname=".$bdd."", $user, $pass,array(\PDO::ATTR_TIMEOUT => 10));
 			$this->mssql->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
-			return "ok";
+			$this->connr = "ok";
 		}
 		catch(Exception $e){
-			return $e->getMessage() ;
+			$this->connr = $e->getMessage() ;
 		}
     }
 	
