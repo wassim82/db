@@ -11,9 +11,10 @@ class Mssql
 		{
 			$this->mssql = new \PDO("dblib:host=".$host.";dbname=".$bdd."", $user, $pass,array(\PDO::ATTR_TIMEOUT => 10));
 			$this->mssql->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
+			return "ok";
 		}
 		catch(Exception $e){
-			echo $e->getMessage() ;
+			return $e->getMessage() ;
 		}
     }
 	
