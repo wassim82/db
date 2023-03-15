@@ -25,7 +25,6 @@ class Mysqli
 
 		$result = mysqli_query($this->wasmysqli,$sql);
 		$rs = mysqli_fetch_array( $result );
-		if(empty($rs)){return "";}
 		return($rs[0]);
 	}
 
@@ -52,7 +51,7 @@ class Mysqli
 
 	function esc($var)
 	{
-		if(empty($var)){return "";}
+
 		$var = trim($var);
 		$var = mysqli_real_escape_string($this->wasmysqli,$var);
 		return $var;
