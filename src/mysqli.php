@@ -115,6 +115,42 @@ class Mysqli
 		}
 	}
 	
+	function sql_replace($champs,$table, $mode = "")
+	{
+
+		$sql = "REPLACE INTO ".$table." ";
+		$sqlchamps = "";
+		$sqlvaleurs = "";
+
+		reset($champs);
+		for ($i = 0; $i < sizeof($champs); $i++)
+		{
+			$sqla = "";
+			if($i<sizeof($champs)&&$i>0)
+			{
+				$sqla = ", ";
+			}
+			$sqlchamps .= $sqla."`".$champs[$i][0]."`";
+			$sqlvaleurs .= $sqla."'".$this->sql_encode($champs[$i][1])."'";
+			$sqla = "";
+		}
+		$sql .= "(".$sqlchamps.") VALUES (".$sqlvaleurs.")";
+		
+		if($mode=="")
+		{
+			mysqli_query($this->wasmysqli,$sql);
+			return mysqli_insert_id($this->wasmysqli);
+		}
+		else if($mode=="multins")
+		{
+			return ", (".$sqlvaleurs.")";
+		}
+		else
+		{
+			return $sql;
+		}
+	}
+	
 	function inserts($ch,$val,$tbl)
 	{
 		$sql = "INSERT INTO ".$this->chformat($tbl)." ";
