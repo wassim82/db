@@ -52,7 +52,7 @@ class Mysqli
 	function esc($var)
 	{
 
-		$var = trim($var);
+		$var = trim((string) $var);
 		$var = mysqli_real_escape_string($this->wasmysqli,$var);
 		return $var;
 	}
